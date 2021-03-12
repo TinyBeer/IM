@@ -2,8 +2,9 @@ package main
 
 import (
 	"ChartRoom/common/message"
-	"encoding/binary"
+	"ChartRoom/common/utils"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net"
 )
@@ -14,7 +15,6 @@ func login(userID int, userPwd string) (err error) {
 	if err != nil {
 		return err
 	}
-
 	// 延迟断开
 	defer conn.Close()
 
@@ -37,49 +37,26 @@ func login(userID int, userPwd string) (err error) {
 	// 5.填充mes.Data
 	mes.Data = string(data)
 
-	// 6.序列化mes
-	data, err = json.Marshal(&mes)
-	if err != nil {
-		return err
-	}
+	// 使用Transfer发送数据
 
-	// 发送data的长度给服务器
-	var pkgLen uint32
-	pkgLen = uint32(len(data))
-	var buf [4]byte
-	binary.BigEndian.PutUint32(buf[0:4], pkgLen)
+	tf := utils.NewTransfer(conn)
+	tf.WritePkg(&mes)
 
-	// 发送长度
-	n, err := conn.Write(buf[0:4])
-	if n != 4 || err != nil {
-		fmt.Println("conn.Write failed, err=", err.Error())
-		return
-	}
-
-	fmt.Println("客户端发送消息长度成功")
-	fmt.Println("内容:", string(data))
-
-	// 发送消息体
-	_, err = conn.Write(data)
-	if err != nil {
-		fmt.Println("conn.Write failed, err=", err.Error())
-		return
-	}
-
-	mes, err = readPkg(conn)
+	// 读取客服务端返回的mes
+	resMes, err := tf.ReadPkg()
 
 	if err != nil {
-		fmt.Println("err=", err.Error())
+		// fmt.Println("err=", err.Error())
 		return
 	}
-	// 反序列化 mes.Data
+	// 反序列化 resMes.Data
 	var loginResMes message.LoginResMes
-	err = json.Unmarshal([]byte(mes.Data), &loginResMes)
+	err = json.Unmarshal([]byte(resMes.Data), &loginResMes)
 	if loginResMes.Code == 200 {
-		// fmt.Println("登陆成功")
-		return
+		fmt.Println("登陆成功")
+		return nil
 	} else {
-		fmt.Println(loginResMes.Error)
+		err = errors.New(loginResMes.Error)
 	}
 	return
 }
