@@ -13,6 +13,51 @@ type UserProcess struct {
 	Conn net.Conn
 }
 
+// 处理注册mes
+func (up *UserProcess) ServerProccessRegister(mes *message.Message) (err error) {
+	var registerMes message.RegisterMes
+	err = json.Unmarshal([]byte(mes.Data), &registerMes)
+	if err != nil {
+		return
+	}
+
+	// 声明返回消息
+	var resMes message.Message
+	resMes.Type = message.RegisterMesResType
+	// 声明注册返回消息体
+	var registerResMes message.RegisterResMes
+
+	// 进行注册
+	err = model.MyUserDao.Register(&registerMes.User)
+	if err != nil {
+		switch err {
+		case model.ERROR_USER_EXIST:
+			registerResMes.Code = 505
+			registerResMes.Error = err.Error()
+		default:
+			registerResMes.Code = 506
+			registerResMes.Error = "注册时发生未知错误"
+		}
+	} else {
+		registerResMes.Code = 200
+	}
+
+	// 3.序列化
+	data, err := json.Marshal(&registerResMes)
+	if err != nil {
+		fmt.Println("json.Marshal failed, err=", err)
+		return
+	}
+
+	// 4.将data赋值给mes.Data
+	resMes.Data = string(data)
+
+	// 使用Transfer返回resMes
+	tf := utils.NewTransfer(up.Conn)
+	tf.WritePkg(&resMes)
+	return
+}
+
 // 处理登录mes
 func (up *UserProcess) ServerProcessLogin(mes *message.Message) (err error) {
 	// 1.先取出mes.Data，并反序列化

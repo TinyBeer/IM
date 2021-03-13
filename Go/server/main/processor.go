@@ -21,6 +21,9 @@ func (pro *Processor) serverProcess(mes *message.Message) (err error) {
 		up := &processes.UserProcess{Conn: pro.Conn}
 		up.ServerProcessLogin(mes)
 	case message.RegisterMesType:
+		up := &processes.UserProcess{Conn: pro.Conn}
+		// 处理注册消息
+		up.ServerProccessRegister(mes)
 	default:
 		err = errors.New("未知消息类型")
 	}

@@ -6,10 +6,11 @@ import (
 )
 
 var (
-	key     int
-	userID  int
-	userPwd string
-	loop    bool
+	key      int
+	userID   int
+	userPwd  string
+	userName string
+	loop     bool
 )
 
 func main() {
@@ -34,6 +35,15 @@ func main() {
 			up.Login(userID, userPwd)
 		case 2:
 			fmt.Println("------注册用户")
+			fmt.Println("请输入用户ID：")
+			fmt.Scanln(&userID)
+			fmt.Println("请输入密码：")
+			fmt.Scanln(&userPwd)
+			fmt.Println("请输入用户昵称：")
+			fmt.Scanln(&userName)
+			// 调用UserDao实例  实现注册
+			up := &processes.UserProcess{}
+			up.Register(userID, userPwd, userName)
 		case 3:
 			fmt.Println("------退出聊天室")
 			loop = false
@@ -41,19 +51,5 @@ func main() {
 			fmt.Print("您的输入有误，请重新输入：")
 		}
 
-		// if key == 1 {
-		// 	fmt.Println("请输入用户ID：")
-		// 	fmt.Scanln(&userID)
-		// 	fmt.Println("请输入密码：")
-		// 	fmt.Scanln(&userPwd)
-		// 	err := login(userID, userPwd)
-		// 	if err != nil {
-		// 		fmt.Println(err.Error())
-		// 	} else {
-		// 		fmt.Println("登录成功1")
-		// 	}
-		// } else if key == 2 {
-		// 	fmt.Println("进行用户注册处理")
-		// }
 	}
 }

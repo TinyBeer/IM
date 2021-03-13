@@ -1,6 +1,7 @@
 package model
 
 import (
+	"ChartRoom/common/message"
 	"encoding/json"
 	"fmt"
 
@@ -27,7 +28,7 @@ func NewUserDao(pool *redis.Pool) (userDao *UserDao) {
 
 // 以下是增删改查
 // 根据一个用户id返回一个User实例
-func (udao *UserDao) getUserById(conn redis.Conn, id int) (user *User, err error) {
+func (udao *UserDao) getUserById(conn redis.Conn, id int) (user *message.User, err error) {
 	// 通过给定的id 去redis查询用户
 	res, err := redis.String(conn.Do("HGet", "users", id))
 	if err != nil {
@@ -39,7 +40,7 @@ func (udao *UserDao) getUserById(conn redis.Conn, id int) (user *User, err error
 		return nil, err
 	}
 	fmt.Println(res)
-	user = &User{}
+	user = &message.User{}
 	// 无错误  将res反序列化为User实例
 	err = json.Unmarshal([]byte(res), user)
 	if err != nil {
@@ -49,10 +50,38 @@ func (udao *UserDao) getUserById(conn redis.Conn, id int) (user *User, err error
 	return
 }
 
+// Register向redis注册用户
+func (udao *UserDao) Register(user *message.User) (err error) {
+	// 从连接池取出连接
+	conn := udao.Pool.Get()
+	// 延时关闭
+	defer conn.Close()
+
+	_, err = udao.getUserById(conn, user.UserID)
+	if err == nil {
+		// 用户ID已经存在
+		return ERROR_USER_EXIST
+	}
+
+	// 该用户ID可用
+	data, err := json.Marshal(user)
+	if err != nil {
+		return
+	}
+
+	// 入库
+	_, err = conn.Do("HSet", "users", user.UserID, string(data))
+	if err != nil {
+		fmt.Println("用户信息入库失败")
+		return
+	}
+	return
+}
+
 // 完成登录校验 Login
 // 完成对用户信息的校验
 // 如果用户的id或pwd有错误 返回错误信息
-func (udao *UserDao) Login(userID int, userPwd string) (user *User, err error) {
+func (udao *UserDao) Login(userID int, userPwd string) (user *message.User, err error) {
 	// 从连接池取出连接
 	conn := udao.Pool.Get()
 	// 延时关闭

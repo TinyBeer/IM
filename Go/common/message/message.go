@@ -7,6 +7,8 @@ var (
 	LoginResMesType = "LoginMesRes"
 	// RegisterMesType 注册
 	RegisterMesType = "RegisterMes"
+	// RegisterMesResType 注册结果返回消息类型
+	RegisterMesResType = "RegisterMesRes"
 )
 
 // Message ：消息类型
@@ -28,6 +30,13 @@ type LoginResMes struct {
 	Error string `json:"error"` // 放回错误信息
 }
 
-// RegisterMes :
+// RegisterMes :注册消息
 type RegisterMes struct {
+	User User `json:"user"`
+}
+
+// RegisterResMes
+type RegisterResMes struct {
+	Code  int    `json:"code"`  // 400 用户已存在  200 注册成功
+	Error string `json:"error"` // 错误提示
 }
