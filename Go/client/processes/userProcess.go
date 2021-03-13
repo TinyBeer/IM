@@ -124,7 +124,13 @@ func (up *UserProcess) Login(userID int, userPwd string) (err error) {
 		// 可以显示当前在线用户id列表
 		fmt.Println("当前在线用户列表如下:")
 		for _, onlineUserID := range loginResMes.OnlineUsersID {
-			fmt.Printf("用户id:%d\t\n", onlineUserID)
+			fmt.Printf("用户id:%d\n", onlineUserID)
+			// 初始化onlineUsers
+			user := &message.User{
+				UserID:     onlineUserID,
+				UserStatus: message.USER_ONLINE,
+			}
+			onlineUsers[onlineUserID] = user
 		}
 		fmt.Println()
 		// 启一个协程保持和服务器的练习
@@ -139,20 +145,4 @@ func (up *UserProcess) Login(userID int, userPwd string) (err error) {
 		fmt.Println(loginResMes.Error)
 	}
 	return
-}
-
-// 和服务器保持通信
-func serverMesProcess(conn net.Conn) {
-	// 创建一个Transfer 不停的读取消息
-	tf := utils.NewTransfer(conn)
-	for {
-		fmt.Println("客户端正在读取服务器发送的消息")
-		mes, err := tf.ReadPkg()
-		if err != nil {
-			fmt.Println("tf.ReadPkg failed, err=", err.Error())
-			return
-		}
-
-		fmt.Printf("mes = %v\n", mes)
-	}
 }

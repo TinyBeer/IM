@@ -1,7 +1,11 @@
 package processes
 
 import (
+	"ChartRoom/common/message"
+	"ChartRoom/common/utils"
+	"encoding/json"
 	"fmt"
+	"net"
 	"os"
 )
 
@@ -19,7 +23,8 @@ func ShowMenu(userName string) {
 	fmt.Scanln(&key)
 	switch key {
 	case 1:
-		fmt.Println("显示在线用户列表")
+		// fmt.Println("显示在线用户列表")
+		outputOnlineUsers()
 	case 2:
 		fmt.Println("发送消息")
 	case 3:
@@ -32,4 +37,38 @@ func ShowMenu(userName string) {
 
 	}
 
+}
+
+// 和服务器保持通信
+func serverMesProcess(conn net.Conn) {
+	// 创建一个Transfer 不停的读取消息
+	tf := utils.NewTransfer(conn)
+	for {
+		// fmt.Println("客户端正在读取服务器发送的消息")
+		mes, err := tf.ReadPkg()
+		if err != nil {
+			fmt.Println("tf.ReadPkg failed, err=", err.Error())
+			return
+		}
+
+		// fmt.Printf("mes = %v\n", mes)
+
+		switch mes.Type {
+		case message.NotifyUserStatusMesType:
+			// 处理用户上上线消息
+			// 取出NotifyUserStatusMes
+			var notifyUserStatusMes message.NotifyUserStatusMes
+			// 反序列化
+			err = json.Unmarshal([]byte(mes.Data), &notifyUserStatusMes)
+			if err != nil {
+				fmt.Println("json.Unmarshall failed, err=", err.Error())
+				continue
+			}
+			updateUserStatus(&notifyUserStatusMes)
+			outputOnlineUsers()
+		default:
+			fmt.Println("获取到未知消息类型")
+		}
+
+	}
 }

@@ -48,7 +48,7 @@ func (pro *Processor) Process2() (err error) {
 
 		}
 
-		fmt.Println("mes=", mes)
+		// fmt.Println("mes=", mes)
 
 		err = pro.serverProcess(&mes)
 		if err != nil {

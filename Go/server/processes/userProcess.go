@@ -16,6 +16,50 @@ type UserProcess struct {
 	UserID int
 }
 
+// 编写通知用户在线的方法
+func (up *UserProcess) NotifyOthersOnline(userId int) (err error) {
+	// 遍历onlineUsers  一个一个发送消息
+	for id, up := range userMgr.onlineUsers {
+		if id == userId {
+			continue
+		}
+
+		// 开始通知上线
+		up.NotifyMeOnline(userId)
+	}
+	return
+}
+
+func (up *UserProcess) NotifyMeOnline(userId int) {
+
+	// 开始组装NotifyUserStatusMes
+	var mes message.Message
+	mes.Type = message.NotifyUserStatusMesType
+
+	var notifyUserStatusMes message.NotifyUserStatusMes
+	notifyUserStatusMes.UserID = userId
+	notifyUserStatusMes.UserStatus = message.USER_ONLINE
+
+	// 序列换
+	data, err := json.Marshal(&notifyUserStatusMes)
+	if err != nil {
+		fmt.Println("json.Marshal failed, err=", err.Error())
+		return
+	}
+
+	// 装填到mes包
+	mes.Data = string(data)
+
+	// 传输mes
+	tf := utils.NewTransfer(up.Conn)
+
+	err = tf.WritePkg(&mes)
+	if err != nil {
+		fmt.Println("tf.WritePkg failed, err=", err.Error())
+		return
+	}
+}
+
 // 处理注册mes
 func (up *UserProcess) ServerProccessRegister(mes *message.Message) (err error) {
 	var registerMes message.RegisterMes
@@ -96,6 +140,9 @@ func (up *UserProcess) ServerProcessLogin(mes *message.Message) (err error) {
 		// 为up加入UserID
 		up.UserID = loginMes.UserID
 		userMgr.AddOnlineUser(up)
+		fmt.Printf("用户%d登录\n", loginMes.UserID)
+		// 通知其他用户上线
+		up.NotifyOthersOnline(loginMes.UserID)
 
 		loginResMes.UserName = user.UserName
 

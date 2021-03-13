@@ -1,5 +1,12 @@
 package message
 
+// 定义用户在线状态
+const (
+	USER_ONLINE = iota
+	USER_OFFLINE
+	USER_BUSY
+)
+
 var (
 	// LoginMesType 登录消息类型
 	LoginMesType = "LoginMes"
@@ -9,6 +16,8 @@ var (
 	RegisterMesType = "RegisterMes"
 	// RegisterMesResType 注册结果返回消息类型
 	RegisterMesResType = "RegisterMesRes"
+	// NotifyUserStatusMes 推送用户登录消息
+	NotifyUserStatusMesType = "NotifyUserStatusMes"
 )
 
 // Message ：消息类型
@@ -41,4 +50,10 @@ type RegisterMes struct {
 type RegisterResMes struct {
 	Code  int    `json:"code"`  // 400 用户已存在  200 注册成功
 	Error string `json:"error"` // 错误提示
+}
+
+// 配合服务器推送上线通知
+type NotifyUserStatusMes struct {
+	UserID     int `json:"userID"`
+	UserStatus int `json:"userStatus"`
 }
