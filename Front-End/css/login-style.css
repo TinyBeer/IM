@@ -1,0 +1,75 @@
+body {
+    /* 设置背景渐变 */
+    background-image: linear-gradient(to left, rgb(114, 218, 231), rgb(214, 109, 235));
+    display: flex;
+    justify-content: center;
+    margin:0px;
+    height:100vh;    
+    width: 100vw;
+}
+
+#container {
+    position: relative;
+    top: 20px;
+    height:80%;    
+    width: 80%;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 8);
+    display: flex;
+}
+
+#img-container {
+    height: 100%;
+    width: 70%;
+    /* 图片大小自适应 */
+    background-size: cover;
+}
+
+#form-container {
+    width: 30%;
+    height: 100%;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#form-content {
+    height: 80%;
+    width: 70%;
+}
+#form-content h2 {    
+    font-size: 24px;
+    width: 80%;
+}
+
+.seleted {
+    font-size: 32px;
+    color: blue;
+}
+
+.input {
+    width: 80%;
+    margin: 10px 0;
+    outline: none;
+    border: 0;
+    padding: 5px;
+    border-bottom: 2px solid gray;
+    font: 300 30px;
+}
+
+#forget-password {
+    float: right;
+    margin: 10px 0;
+    font-size: 8px;
+}
+
+#login-button {
+    margin-top: 50px;
+    position: relative;
+    width: 80%;
+    font-size: 18px;
+    line-height: 30px;
+    border-radius: 10px;
+    background-image: linear-gradient(to left, rgb(114, 218, 231), rgb(214, 109, 235));
+    text-align: center;
+    outline: none;
+}
