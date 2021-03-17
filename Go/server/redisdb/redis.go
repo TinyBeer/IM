@@ -1,4 +1,4 @@
-package main
+package redisdb
 
 import (
 	"time"
@@ -6,10 +6,10 @@ import (
 	"github.com/garyburd/redigo/redis"
 )
 
-var pool *redis.Pool
+var Pool *redis.Pool
 
-func initPool(address string, maxIdle, maxActive int, idleTimeout time.Duration) {
-	pool = &redis.Pool{
+func InitPool(address string, maxIdle, maxActive int, idleTimeout time.Duration) {
+	Pool = &redis.Pool{
 		MaxIdle:     maxIdle,     // 最大空闲数
 		MaxActive:   maxActive,   // 最大连接数
 		IdleTimeout: idleTimeout, // 最大空闲事件

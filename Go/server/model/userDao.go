@@ -2,6 +2,7 @@ package model
 
 import (
 	"ChartRoom/common/message"
+	"ChartRoom/server/redisdb"
 	"encoding/json"
 	"fmt"
 
@@ -18,6 +19,10 @@ type UserDao struct {
 	Pool *redis.Pool
 }
 
+func InitUserDao() {
+	MyUserDao = NewUserDao(redisdb.Pool)
+}
+
 // 使用工厂模式创建UserDao实例
 func NewUserDao(pool *redis.Pool) (userDao *UserDao) {
 	userDao = &UserDao{
@@ -28,7 +33,7 @@ func NewUserDao(pool *redis.Pool) (userDao *UserDao) {
 
 // 以下是增删改查
 // 根据一个用户id返回一个User实例
-func (udao *UserDao) getUserById(conn redis.Conn, id int) (user *message.User, err error) {
+func (udao *UserDao) GetUserById(conn redis.Conn, id int) (user *message.User, err error) {
 	// 通过给定的id 去redis查询用户
 	res, err := redis.String(conn.Do("HGet", "users", id))
 	if err != nil {
@@ -57,7 +62,7 @@ func (udao *UserDao) Register(user *message.User) (err error) {
 	// 延时关闭
 	defer conn.Close()
 
-	_, err = udao.getUserById(conn, user.UserID)
+	_, err = udao.GetUserById(conn, user.UserID)
 	if err == nil {
 		// 用户ID已经存在
 		return ERROR_USER_EXIST
@@ -87,7 +92,7 @@ func (udao *UserDao) Login(userID int, userPwd string) (user *message.User, err 
 	// 延时关闭
 	defer conn.Close()
 
-	user, err = udao.getUserById(conn, userID)
+	user, err = udao.GetUserById(conn, userID)
 	if err != nil {
 		return
 	}

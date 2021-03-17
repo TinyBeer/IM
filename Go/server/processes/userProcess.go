@@ -184,7 +184,7 @@ func (up *UserProcess) ServerProcessLogin(mes *message.Message) (err error) {
 	resMes.Type = message.LoginResMesType
 	var loginResMes message.LoginResMes
 
-	// 2.比对
+	// 2.比对数据库
 	// 到redis数据库进行验证
 	user, err := model.MyUserDao.Login(loginMes.UserID, loginMes.UserPwd)
 	if err != nil {
@@ -220,7 +220,7 @@ func (up *UserProcess) ServerProcessLogin(mes *message.Message) (err error) {
 		}
 	}
 
-	// 3.序列化
+	// 3.封包
 	err = utils.Pack(&resMes, &loginResMes)
 	if err != nil {
 		fmt.Println("Pack failed, err=", err)
@@ -237,46 +237,13 @@ func (up *UserProcess) ServerProcessLogin(mes *message.Message) (err error) {
 	tf := utils.NewTransfer(up.Conn)
 	tf.WriteData(data)
 
+	// 登录确认消息发送后执行
+	// 登录成功则发送离线留言
 	if loginResMes.Code == 200 {
-		// 获取离线留言
-		dataSlice, mesErr := model.MyUserDao.WithdrawOfflineMesById(up.UserID)
-		if mesErr != nil {
-			log.Println("WithdrawOfflineMesById failed, err=", mesErr.Error())
-			return
-		}
-
-		// 创建 messageMes
-		var mes message.Message
-		mes.Type = message.SmsMesType
-		var messageMes message.MessageMes
-		var smsMes message.SmsMes
 		smsProcess := &SmsProcess{}
-		for _, messageString := range dataSlice {
-			if err != nil {
-				log.Println("Unmarshal failed, err=", mesErr.Error())
-				continue
-			}
-			// 反序列化 messageMes
-			mesErr = json.Unmarshal([]byte(messageString), &messageMes)
-			if mesErr != nil {
-				log.Println("Unmarshal failed, err=", mesErr.Error())
-				return
-			}
-
-			// 装填smsMes信息
-			smsMes.Content = messageMes.Content
-			smsMes.User = messageMes.User
-
-			// 封包
-			mesErr = utils.Pack(&mes, &smsMes)
-			if err != mesErr {
-				fmt.Println("Pack failed, err=", err)
-				return
-			}
-			log.Println(mes)
-
-			// 发送
-			smsProcess.SendMesToEachOnlineUser(&mes, up.Conn)
+		mesErr := smsProcess.SendOfflineMessage(up.UserID, up.Conn)
+		if mesErr != nil {
+			log.Println("SendOfflineMessage failed, err=", mesErr.Error())
 		}
 	}
 

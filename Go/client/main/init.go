@@ -57,7 +57,7 @@ func InitView() *view.PageMgr {
 	p.AddOption("\t在线用户列表", func() {
 		processes.OutputOnlineUsers()
 	})
-	p.AddOption("\t发送消息", func() {
+	p.AddOption("\t群发消息", func() {
 		fmt.Println("请输入要发送的消息:")
 		fmt.Scanf("%s\n", &content)
 		smsProcess.SendGroupMes(content)
@@ -66,7 +66,7 @@ func InitView() *view.PageMgr {
 
 	})
 
-	p.AddOption("\t发送留言", func() {
+	p.AddOption("\t发送消息", func() {
 		fmt.Println("请输入要给用户的ID:")
 		fmt.Scanln(&toUserID)
 		fmt.Println("请输入要发送的消息:")

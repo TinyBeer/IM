@@ -1,9 +1,8 @@
-package main
+package processes
 
 import (
 	"ChartRoom/common/message"
 	"ChartRoom/common/utils"
-	"ChartRoom/server/processes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -20,21 +19,21 @@ func (pro *Processor) serverProcess(mes *message.Message) (err error) {
 	switch mes.Type {
 	case message.LoginMesType:
 		// 创建UserProcess实例
-		up := &processes.UserProcess{Conn: pro.Conn}
+		up := &UserProcess{Conn: pro.Conn}
 		up.ServerProcessLogin(mes)
 	case message.RegisterMesType:
-		up := &processes.UserProcess{Conn: pro.Conn}
+		up := &UserProcess{Conn: pro.Conn}
 		// 处理注册消息
 		up.ServerProccessRegister(mes)
 	case message.SmsMesType:
-		smsProcess := &processes.SmsProcess{}
+		smsProcess := &SmsProcess{}
 		smsProcess.SendGroupMes(mes)
 	case message.LogoutMesType:
-		up := &processes.UserProcess{Conn: pro.Conn}
+		up := &UserProcess{Conn: pro.Conn}
 		up.ServerProcessLogout(mes)
 		return errors.New("用户登出")
 	case message.MessageMesType:
-		smsProcess := &processes.SmsProcess{}
+		smsProcess := &SmsProcess{}
 		smsProcess.SendMessage(mes)
 	default:
 		err = errors.New("未知消息类型")
@@ -44,7 +43,7 @@ func (pro *Processor) serverProcess(mes *message.Message) (err error) {
 	return
 }
 
-func (pro *Processor) Process2() (err error) {
+func (pro *Processor) Process() (err error) {
 	// 使用Transfer读写数据
 	tf := utils.NewTransfer(pro.Conn)
 	// 读取客户发送的消息
