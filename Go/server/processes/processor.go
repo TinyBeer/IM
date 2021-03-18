@@ -5,7 +5,6 @@ import (
 	"ChartRoom/common/utils"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"log"
 	"net"
@@ -15,16 +14,17 @@ type Processor struct {
 	Conn net.Conn
 }
 
+// 仅处理用户上限后的业务
 func (pro *Processor) serverProcess(mes *message.Message) (err error) {
 	switch mes.Type {
-	case message.LoginMesType:
-		// 创建UserProcess实例
-		up := &UserProcess{Conn: pro.Conn}
-		up.ServerProcessLogin(mes)
-	case message.RegisterMesType:
-		up := &UserProcess{Conn: pro.Conn}
-		// 处理注册消息
-		up.ServerProccessRegister(mes)
+	// case message.LoginMesType:
+	// 	// 创建UserProcess实例
+	// 	up := &UserProcess{Conn: pro.Conn}
+	// 	up.ServerProcessLogin(mes)
+	// case message.RegisterMesType:
+	// 	up := &UserProcess{Conn: pro.Conn}
+	// 	// 处理注册消息
+	// 	up.ServerProccessRegister(mes)
 	case message.SmsMesType:
 		smsProcess := &SmsProcess{}
 		smsProcess.SendGroupMes(mes)
@@ -39,7 +39,6 @@ func (pro *Processor) serverProcess(mes *message.Message) (err error) {
 		err = errors.New("未知消息类型")
 		log.Println("mes=", mes)
 	}
-
 	return
 }
 
@@ -48,16 +47,15 @@ func (pro *Processor) Process() (err error) {
 	tf := utils.NewTransfer(pro.Conn)
 	// 读取客户发送的消息
 	for {
-
 		data, err := tf.ReadDate()
 		if err != nil {
-
 			switch err {
 			case io.EOF:
-				fmt.Println("客户端断开连接")
+				log.Println("客户端断开连接")
 			default:
-				fmt.Println("客户端连接中断")
+				log.Println("客户端连接中断")
 			}
+			// 断开连接
 			return err
 		}
 		var mes message.Message
@@ -69,8 +67,8 @@ func (pro *Processor) Process() (err error) {
 
 		err = pro.serverProcess(&mes)
 		if err != nil {
-			// fmt.Println("通讯异常")
-			// fmt.Println("通讯协程断开， err=", err.Error())
+			// 连接断开
+			// 重连或者判断为用户离线
 			continue
 		}
 	}
