@@ -139,7 +139,7 @@ func (up *UserProcess) ServerProccessRegister(mes *message.Message) (err error) 
 	var registerResMes message.RegisterResMes
 
 	// 进行注册
-	err = model.MyUserDao.Register(&registerMes.User)
+	err = model.MyUserDao.Register(&registerMes.RegisterUserInfo)
 	if err != nil {
 		switch err {
 		case model.ERROR_USER_EXIST:
@@ -187,38 +187,42 @@ func (up *UserProcess) ServerProcessLogin(mes *message.Message) (err error) {
 
 	// 2.比对数据库
 	// 到redis数据库进行验证
-	user, err := model.MyUserDao.Login(loginMes.UserID, loginMes.UserPwd)
-	if err != nil {
-		switch err {
-		case model.ERROR_USER_NOTEXIST:
-			loginResMes.Code = 500 // 500 用户不存在
-			loginResMes.Error = err.Error()
-		case model.ERROR_USER_PWD:
-			loginResMes.Code = 403 // 403 密码不正确
-			loginResMes.Error = err.Error()
-		default:
-			loginResMes.Code = 505 // 505 服务器内部错误
-			loginResMes.Error = "服务器内部错误"
-		}
-	} else {
-		loginResMes.Code = 200 // 登录成功
-		// 用户登录成功  更行onlineUsers
-		// 为up加入UserID
-		up.UserID = loginMes.UserID
-		userMgr.AddOnlineUser(up)
-		fmt.Printf("用户%d登录\n", loginMes.UserID)
-		// 通知其他用户上线
-		up.NotifyOthersOnline(loginMes.UserID)
-
-		loginResMes.UserName = user.UserName
-
-		// fmt.Println(user)
-		for id, _ := range userMgr.onlineUsers {
-			if id == user.UserID {
-				continue
+	switch loginMes.AutenticationType {
+	case message.PasswordType:
+		user, err := model.MyUserDao.Login(loginMes.UserID, loginMes.UserPwd)
+		if err != nil {
+			switch err {
+			case model.ERROR_USER_NOTEXIST:
+				loginResMes.Code = 500 // 500 用户不存在
+				loginResMes.Error = err.Error()
+			case model.ERROR_USER_PWD:
+				loginResMes.Code = 403 // 403 密码不正确
+				loginResMes.Error = err.Error()
+			default:
+				loginResMes.Code = 505 // 505 服务器内部错误
+				loginResMes.Error = "服务器内部错误"
 			}
-			loginResMes.OnlineUsersID = append(loginResMes.OnlineUsersID, id)
+		} else {
+			loginResMes.Code = 200 // 登录成功
+			// 用户登录成功  更行onlineUsers
+			// 为up加入UserID
+			up.UserID = loginMes.UserID
+			loginResMes.UserName = user.UserName
+			userMgr.AddOnlineUser(up)
+			fmt.Printf("用户%d登录\n", loginMes.UserID)
+			// 通知其他用户上线
+			up.NotifyOthersOnline(loginMes.UserID)
+
+			// fmt.Println(user)
+			for id, _ := range userMgr.onlineUsers {
+				if id == user.UserID {
+					continue
+				}
+				loginResMes.OnlineUsersID = append(loginResMes.OnlineUsersID, id)
+			}
 		}
+	default:
+		return
 	}
 
 	// 3.封包

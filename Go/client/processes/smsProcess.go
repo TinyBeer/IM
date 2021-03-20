@@ -19,7 +19,7 @@ func (sp *SmsProcess) SendMessageToUser(toUserID int, content string) (err error
 	var messageMes message.MessageMes
 
 	// 2.装在messageMes数据
-	messageMes.User = CurUser.User
+	messageMes.UserID = CurUser.User.UserID
 	messageMes.ToUserID = toUserID
 	messageMes.Content = content
 
@@ -48,6 +48,7 @@ func (sp *SmsProcess) SendMessageToUser(toUserID int, content string) (err error
 	return
 }
 
+// 发送群发消息
 func (sp *SmsProcess) SendGroupMes(content string) (err error) {
 	// 创建一个mes
 	var mes message.Message
@@ -57,7 +58,6 @@ func (sp *SmsProcess) SendGroupMes(content string) (err error) {
 	smsMes.Content = content
 
 	smsMes.UserID = CurUser.UserID
-	smsMes.UserStatus = CurUser.UserStatus
 
 	// 序列化smsMes
 	err = message.Pack(&mes, &smsMes)

@@ -3,11 +3,12 @@ package processes
 import (
 	"ChartRoom/Go/client/model"
 	"ChartRoom/Go/common/message"
+	"ChartRoom/Go/common/userinfo"
 	"fmt"
 )
 
 /// 客户端需要维护的map
-var onlineUsers map[int]*message.User = make(map[int]*message.User, 10)
+var onlineUsers map[int]*userinfo.User = make(map[int]*userinfo.User, 10)
 var CurUser model.CurUser
 
 // 哭护短显示当前在线用户
@@ -24,20 +25,22 @@ func updateUserStatus(notifyUserStatusMes *message.NotifyUserStatusMes) {
 	// 查询在线用户列表
 	user, ok := onlineUsers[notifyUserStatusMes.UserID]
 	if !ok {
-		// 用户在在线用户列表
+		// 用户不在在线用户列表
 		if notifyUserStatusMes.UserStatus != message.USER_OFFLINE {
 			// 非下线通知 则更向在线用户列表添加用户
-			onlineUsers[notifyUserStatusMes.UserID] = &message.User{
+			onlineUsers[notifyUserStatusMes.UserID] = &userinfo.User{
 				UserID:     notifyUserStatusMes.UserID,
 				UserStatus: notifyUserStatusMes.UserStatus,
 			}
+			fmt.Printf("用户%d上线\n", notifyUserStatusMes.UserID)
 		}
 
 	} else {
-		// 用户不在在线用户列表
+		// 用户在在线用户列表
 		if notifyUserStatusMes.UserStatus == message.USER_OFFLINE {
 			// 用户下线 则将用户从在线用户列表中移除
 			delete(onlineUsers, notifyUserStatusMes.UserID)
+			fmt.Printf("用户%d下线\n", notifyUserStatusMes.UserID)
 		} else {
 			// 非下线通知 则更新用户状态
 			user.UserStatus = notifyUserStatusMes.UserStatus

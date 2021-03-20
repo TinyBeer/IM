@@ -1,7 +1,7 @@
 package model
 
 import (
-	"ChartRoom/Go/common/message"
+	"ChartRoom/Go/common/userinfo"
 
 	"encoding/json"
 	"fmt"
@@ -33,7 +33,7 @@ func NewUserDao(pool *redis.Pool) (userDao *UserDao) {
 
 // 以下是增删改查
 // 根据一个用户id返回一个User实例
-func (udao *UserDao) GetUserById(conn redis.Conn, id int) (user *message.User, err error) {
+func (udao *UserDao) GetUserById(conn redis.Conn, id int) (user *userinfo.User, err error) {
 	// 通过给定的id 去redis查询用户
 	res, err := redis.String(conn.Do("HGet", "users", id))
 	if err != nil {
@@ -45,7 +45,7 @@ func (udao *UserDao) GetUserById(conn redis.Conn, id int) (user *message.User, e
 		return nil, err
 	}
 	// fmt.Println(res)
-	user = &message.User{}
+	user = &userinfo.User{}
 	// 无错误  将res反序列化为User实例
 	err = json.Unmarshal([]byte(res), user)
 	if err != nil {
@@ -56,7 +56,7 @@ func (udao *UserDao) GetUserById(conn redis.Conn, id int) (user *message.User, e
 }
 
 // Register向redis注册用户
-func (udao *UserDao) Register(user *message.User) (err error) {
+func (udao *UserDao) Register(user *userinfo.RegisterUserInfo) (err error) {
 	// 从连接池取出连接
 	conn := udao.Pool.Get()
 	// 延时关闭
@@ -86,7 +86,7 @@ func (udao *UserDao) Register(user *message.User) (err error) {
 // 完成登录校验 Login
 // 完成对用户信息的校验
 // 如果用户的id或pwd有错误 返回错误信息
-func (udao *UserDao) Login(userID int, userPwd string) (user *message.User, err error) {
+func (udao *UserDao) Login(userID int, userPwd string) (user *userinfo.User, err error) {
 	// 从连接池取出连接
 	conn := udao.Pool.Get()
 	// 延时关闭

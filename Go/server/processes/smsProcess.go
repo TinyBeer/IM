@@ -43,7 +43,7 @@ func (sp *SmsProcess) SendOfflineMessage(userID int, conn net.Conn) (err error) 
 
 		// 装填smsMes信息
 		smsMes.Content = messageMes.Content
-		smsMes.User = messageMes.User
+		smsMes.UserID = messageMes.UserID
 
 		// 封包
 		mesErr = message.Pack(&mes, &smsMes)
@@ -89,7 +89,7 @@ func (sp *SmsProcess) SendMessage(mes *message.Message) (err error) {
 
 		var smsMes message.SmsMes
 		smsMes.Content = messageMes.Content
-		smsMes.User = messageMes.User
+		smsMes.UserID = messageMes.UserID
 		// 封包
 		err = message.Pack(&sendMes, &smsMes)
 		if err != nil {

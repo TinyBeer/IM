@@ -2,6 +2,7 @@ package processes
 
 import (
 	"ChartRoom/Go/common/message"
+	"ChartRoom/Go/common/userinfo"
 	"ChartRoom/Go/common/utils"
 	"encoding/json"
 	"errors"
@@ -29,9 +30,9 @@ func (up *UserProcess) Register(userID int, userPwd, userName string) (err error
 
 	// 3.创建registerMes结构体
 	var registerMes message.RegisterMes
-	registerMes.User.UserID = userID
-	registerMes.User.UserPwd = userPwd
-	registerMes.User.UserName = userName
+	registerMes.UserID = userID
+	registerMes.UserPwd = userPwd
+	registerMes.UserName = userName
 
 	// 封包
 	err = message.Pack(&mes, &registerMes)
@@ -86,7 +87,7 @@ func (up *UserProcess) Logout() {
 	mes.Type = message.LogoutMesType
 	// 2.创建logoutMes
 	var logoutMes message.LogoutMes
-	logoutMes.User = CurUser.User
+	logoutMes.UserID = CurUser.User.UserID
 	// 3.封包
 	err := message.Pack(&mes, &logoutMes)
 	if err != nil {
@@ -118,6 +119,7 @@ func (up *UserProcess) Login(userID int, userPwd string) (conn net.Conn, err err
 
 	// 3.创建loginMes结构体
 	var loginMes message.LoginMes
+	loginMes.AutenticationType = message.PasswordType
 	loginMes.UserID = userID
 	loginMes.UserPwd = userPwd
 
@@ -172,7 +174,7 @@ func (up *UserProcess) Login(userID int, userPwd string) (conn net.Conn, err err
 		// 初始化在线用户列表
 		for _, onlineUserID := range loginResMes.OnlineUsersID {
 			// 初始化onlineUsers
-			user := &message.User{
+			user := &userinfo.User{
 				UserID:     onlineUserID,
 				UserStatus: message.USER_ONLINE,
 			}

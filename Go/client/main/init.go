@@ -27,6 +27,7 @@ func InitView() *view.PageMgr {
 	p := pMgr.AddPage("MainPage", "", "------------欢迎登录海量用户聊天系统------------", "")
 	p.AddOption("\t\t登录聊天室", func() {
 		conn, err := UserLogin()
+		p.SetDescription(fmt.Sprintf("------恭喜%s登陆成功------", processes.CurUser.UserName))
 		if err != nil {
 			log.Println(err.Error())
 			return
@@ -52,7 +53,7 @@ func InitView() *view.PageMgr {
 		os.Exit(0)
 	})
 
-	p = pMgr.AddPage("HallPage", "-----聊天室大厅界面-----", "恭喜xxx登录成功", "MainPage")
+	p = pMgr.AddPage("HallPage", "------聊天室大厅界面------", "恭喜xxx登录成功", "MainPage")
 
 	p.AddOption("\t在线用户列表", func() {
 		processes.OutputOnlineUsers()

@@ -49,6 +49,10 @@ func (p *Page) GetParent() *Page {
 	return p.parent
 }
 
+func (p *Page) SetDescription(description string) {
+	p.description = description
+}
+
 func (p *Page) Show() {
 
 	fmt.Println(p.head)

@@ -38,7 +38,6 @@ func ServerMesProcess(conn net.Conn) {
 				continue
 			}
 			updateUserStatus(&notifyUserStatusMes)
-			OutputOnlineUsers()
 		case message.SmsMesType:
 			outputMes(&mes)
 		default:
