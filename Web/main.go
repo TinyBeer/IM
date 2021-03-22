@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -24,6 +25,20 @@ func main() {
 
 	r.GET("/hall", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "hall.html", nil)
+	})
+	var flag = true
+	r.GET("/content", func(c *gin.Context) {
+		var content string
+		if flag {
+			content = "你好呀" + time.Now().Format("2006-01-02 15:04:05")
+		}
+
+		flag = !flag
+
+		c.JSON(http.StatusOK, gin.H{
+			"content": content,
+		})
+
 	})
 
 	r.POST("/login", func(c *gin.Context) {
