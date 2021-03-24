@@ -1,3 +1,15 @@
+
+$('#btn1').click(function(){
+  axios.post('content', {content:$("#input_content").val()})
+  .then(function (response) {
+    console.log(response) 
+    $('#input_content').val('')                         
+  })
+  .catch(function (error) {
+    console.log(error);
+  });
+})
+
 function clock() {
     // NewTalk('hello');
     axios.get('content', {})

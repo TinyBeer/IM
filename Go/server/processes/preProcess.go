@@ -1,8 +1,8 @@
 package processes
 
 import (
-	"ChartRoom/Go/common/message"
-	"ChartRoom/Go/common/utils"
+	"ChatRoom/Go/common/message"
+	"ChatRoom/Go/common/utils"
 	"encoding/json"
 	"errors"
 	"io"
@@ -36,6 +36,7 @@ func (ppro *PreProcessor) PreviousProcess() (servicType int, err error) {
 			log.Println("客户端连接中断")
 		}
 		// 断开连接
+		ppro.Conn.Close()
 		return
 	}
 	var mes message.Message

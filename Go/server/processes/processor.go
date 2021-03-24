@@ -1,8 +1,8 @@
 package processes
 
 import (
-	"ChartRoom/Go/common/message"
-	"ChartRoom/Go/common/utils"
+	"ChatRoom/Go/common/message"
+	"ChatRoom/Go/common/utils"
 	"encoding/json"
 	"errors"
 	"io"
@@ -56,6 +56,18 @@ func (pro *Processor) Process() (err error) {
 				log.Println("客户端连接中断")
 			}
 			// 断开连接
+			pro.Conn.Close()
+
+			var temp int
+			for userID, v := range userMgr.onlineUsers {
+				if v.Conn == pro.Conn {
+					temp = userID
+				}
+			}
+
+			if temp != 0 {
+				delete(userMgr.onlineUsers, temp)
+			}
 			return err
 		}
 		var mes message.Message

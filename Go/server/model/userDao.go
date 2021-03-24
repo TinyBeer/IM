@@ -1,7 +1,7 @@
 package model
 
 import (
-	"ChartRoom/Go/common/userinfo"
+	"ChatRoom/Go/common/userinfo"
 
 	"encoding/json"
 	"fmt"

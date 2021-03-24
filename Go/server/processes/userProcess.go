@@ -1,9 +1,9 @@
 package processes
 
 import (
-	"ChartRoom/Go/common/message"
-	"ChartRoom/Go/common/utils"
-	"ChartRoom/Go/server/model"
+	"ChatRoom/Go/common/message"
+	"ChatRoom/Go/common/utils"
+	"ChatRoom/Go/server/model"
 
 	"encoding/json"
 	"fmt"
@@ -237,7 +237,7 @@ func (up *UserProcess) ServerProcessLogin(mes *message.Message) (err error) {
 	// 3.封包
 	err = message.Pack(&resMes, &loginResMes)
 	if err != nil {
-		fmt.Println("Pack failed, err=", err)
+		log.Println("Pack failed, err=", err)
 		return
 	}
 

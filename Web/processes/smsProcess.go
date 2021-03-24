@@ -1,5 +1,14 @@
 package processes
 
+import (
+	"ChatRoom/Web/common/message"
+	"ChatRoom/Web/common/utils"
+	"encoding/json"
+	"fmt"
+	"log"
+	"net"
+)
+
 // import (
 // 	"ChatRoom/Web/common/message"
 // 	"ChatRoom/Web/common/utils"
@@ -8,8 +17,8 @@ package processes
 // 	"log"
 // )
 
-// type SmsProcess struct {
-// }
+type SmsProcess struct {
+}
 
 // // SendMesToUser toUserID:接收方ID content 内容
 // func (sp *SmsProcess) SendMessageToUser(toUserID int, content string) (err error) {
@@ -48,36 +57,35 @@ package processes
 // 	return
 // }
 
-// // 发送群发消息
-// func (sp *SmsProcess) SendGroupMes(content string) (err error) {
-// 	// 创建一个mes
-// 	var mes message.Message
-// 	mes.Type = message.SmsMesType
+// 发送群发消息
+func (sp *SmsProcess) SendGroupMes(content string, userID int, conn net.Conn) (err error) {
+	// 创建一个mes
+	var mes message.Message
+	mes.Type = message.SmsMesType
 
-// 	var smsMes message.SmsMes
-// 	smsMes.Content = content
+	var smsMes message.SmsMes
+	smsMes.UserID = userID
+	smsMes.Content = content
 
-// 	smsMes.UserID = CurUser.UserID
+	// 序列化smsMes
+	err = message.Pack(&mes, &smsMes)
+	if err != nil {
+		fmt.Println("Pack failed, err=", err.Error())
+		return
+	}
 
-// 	// 序列化smsMes
-// 	err = message.Pack(&mes, &smsMes)
-// 	if err != nil {
-// 		fmt.Println("Pack failed, err=", err.Error())
-// 		return
-// 	}
+	// 序列化
+	data, err := json.Marshal(&mes)
+	if err != nil {
+		return
+	}
 
-// 	// 序列化
-// 	data, err := json.Marshal(&mes)
-// 	if err != nil {
-// 		return
-// 	}
-
-// 	// 发送
-// 	tf := utils.NewTransfer(CurUser.Conn)
-// 	err = tf.WriteData(data)
-// 	if err != nil {
-// 		log.Println("tf.WriteData failed, err=", err.Error())
-// 		return
-// 	}
-// 	return
-// }
+	// 发送
+	tf := utils.NewTransfer(conn)
+	err = tf.WriteData(data)
+	if err != nil {
+		log.Println("tf.WriteData failed, err=", err.Error())
+		return
+	}
+	return
+}

@@ -1,6 +1,6 @@
 package message
 
-import "ChartRoom/Go/common/userinfo"
+import "ChatRoom/Go/common/userinfo"
 
 // 定义用户在线状态
 const (

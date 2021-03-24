@@ -21,8 +21,8 @@
                 <h2 id="function-selection"><span :class="{'seleted': !isRegister}" @click="selectLogin">Login</span>/<span @click="selectRegister" :class="{'seleted': isRegister}">Register</span></h2>
                 <input v-show="isRegister" id="user-name" type="text" class="input" placeholder="User Name">
                 <input id="user-account" type="text" class="input" v-model="userID" placeholder="ACCOUNT">
-                <input id="user-password" type="password" class="input" v-model="password" placeholder="PAASSWORD">
-                <a id="forget-password" v-show="!isRegister" href="#">Forget the password?</a>         
+                <input id="user-password" type="password" class="input" v-model="password" placeholder="PASSWORD">
+                <a id="forget-password" v-show="!isRegister" href="#">Forgot your password?</a>         
                 <button id="login-button" v-text="isRegister?'Register':'Login'" @click="loginDo">Login</button>
             </div> 
             

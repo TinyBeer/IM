@@ -27,7 +27,7 @@ var app = new Vue({
             var that = this
             axios.post('login', {
                 userID: this.userID,
-                password: this.password,
+                userPwd: this.password,
               })
               .then(function (response) {
                   console.log(response.data);

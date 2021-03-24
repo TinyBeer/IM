@@ -1,9 +1,9 @@
 package processes
 
 import (
-	"ChartRoom/Go/common/message"
-	"ChartRoom/Go/common/utils"
-	"ChartRoom/Go/server/model"
+	"ChatRoom/Go/common/message"
+	"ChatRoom/Go/common/utils"
+	"ChatRoom/Go/server/model"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -51,7 +51,6 @@ func (sp *SmsProcess) SendOfflineMessage(userID int, conn net.Conn) (err error) 
 			fmt.Println("Pack failed, err=", err)
 			return
 		}
-		log.Println(mes)
 
 		// 发送
 		sp.SendMesToEachOnlineUser(&mes, conn)

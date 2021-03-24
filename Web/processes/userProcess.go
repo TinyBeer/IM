@@ -14,73 +14,72 @@ type UserProcess struct {
 	// 暂时不需要字段
 }
 
-// // 完成注册任务
-// func (up *UserProcess) Register(userID int, userPwd, userName string) (err error) {
-// 	conn, err := net.Dial("tcp", "192.168.68.166:8889")
-// 	if err != nil {
-// 		return err
-// 	}
-// 	// 延迟断开
-// 	defer conn.Close()
+// 完成注册任务
+func (up *UserProcess) Register(userID int, userPwd, userName string) (err error) {
+	conn, err := net.Dial("tcp", "192.168.68.166:8889")
+	if err != nil {
+		return err
+	}
+	// 延迟断开
+	defer conn.Close()
 
-// 	// 2.准备通过conn发送消息
-// 	var mes message.Message
-// 	mes.Type = message.RegisterMesType
+	// 2.准备通过conn发送消息
+	var mes message.Message
+	mes.Type = message.RegisterMesType
 
-// 	// 3.创建registerMes结构体
-// 	var registerMes message.RegisterMes
-// 	registerMes.UserID = userID
-// 	registerMes.UserPwd = userPwd
-// 	registerMes.UserName = userName
+	// 3.创建registerMes结构体
+	var registerMes message.RegisterMes
+	registerMes.UserID = userID
+	registerMes.UserPwd = userPwd
+	registerMes.UserName = userName
 
-// 	// 封包
-// 	err = message.Pack(&mes, &registerMes)
-// 	if err != nil {
-// 		return err
-// 	}
+	// 封包
+	err = message.Pack(&mes, &registerMes)
+	if err != nil {
+		return err
+	}
 
-// 	// 序列化
-// 	data, err := json.Marshal(&mes)
-// 	if err != nil {
-// 		return
-// 	}
+	// 序列化
+	data, err := json.Marshal(&mes)
+	if err != nil {
+		return
+	}
 
-// 	// 使用Transfer发送数据
-// 	tf := utils.NewTransfer(conn)
-// 	err = tf.WriteData(data)
-// 	if err != nil {
-// 		fmt.Println("注册消息发送失败")
-// 		return
-// 	}
+	// 使用Transfer发送数据
+	tf := utils.NewTransfer(conn)
+	err = tf.WriteData(data)
+	if err != nil {
+		fmt.Println("注册消息发送失败")
+		return
+	}
 
-// 	resData, err := tf.ReadDate()
-// 	if err != nil {
-// 		log.Println("tf.ReadDate failed, err=", err.Error())
-// 		return
-// 	}
-// 	var resMes message.Message
-// 	err = json.Unmarshal(resData, &resMes)
-// 	if err != nil {
-// 		log.Println("json.Unmarshal failed, err=", err.Error())
-// 		return
-// 	}
+	resData, err := tf.ReadDate()
+	if err != nil {
+		log.Println("tf.ReadDate failed, err=", err.Error())
+		return
+	}
+	var resMes message.Message
+	err = json.Unmarshal(resData, &resMes)
+	if err != nil {
+		log.Println("json.Unmarshal failed, err=", err.Error())
+		return
+	}
 
-// 	// 解包
-// 	var registerResMes message.RegisterResMes
-// 	err = message.Unpack(&resMes, &registerResMes)
-// 	if err != nil {
-// 		log.Println("Unpack failed, err=", err.Error())
-// 		return
-// 	}
+	// 解包
+	var registerResMes message.RegisterResMes
+	err = message.Unpack(&resMes, &registerResMes)
+	if err != nil {
+		log.Println("Unpack failed, err=", err.Error())
+		return
+	}
 
-// 	if registerResMes.Code != 200 {
-// 		err = errors.New(registerResMes.Error)
-// 	}
-// 	return
-// }
+	if registerResMes.Code != 200 {
+		err = errors.New(registerResMes.Error)
+	}
+	return
+}
 
 // func (up *UserProcess) Logout() {
-
 // 	// 1.创建mes
 // 	var mes message.Message
 // 	mes.Type = message.LogoutMesType

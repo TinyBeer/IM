@@ -1,8 +1,8 @@
 package main
 
 import (
-	"ChartRoom/Go/client/processes"
-	"ChartRoom/Go/client/view"
+	"ChatRoom/Go/client/processes"
+	"ChatRoom/Go/client/view"
 	"fmt"
 	"log"
 	"net"
@@ -73,7 +73,6 @@ func InitView() *view.PageMgr {
 		fmt.Println("请输入要发送的消息:")
 		fmt.Scanln(&content)
 		smsProcess.SendMessageToUser(toUserID, content)
-		log.Println("ok")
 	})
 
 	p.AddOption("\t退出聊天室", func() {

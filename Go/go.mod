@@ -1,4 +1,4 @@
-module ChartRoom/Go
+module ChatRoom/Go
 
 go 1.16
 
