@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/garyburd/redigo/redis"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // 服务器启动后初始化一个全局的UserDao
@@ -68,6 +69,14 @@ func (udao *UserDao) Register(user *userinfo.RegisterUserInfo) (err error) {
 		return ERROR_USER_EXIST
 	}
 
+	// 存储前 用户id加密
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.UserPwd), bcrypt.DefaultCost)
+	if err != nil {
+		fmt.Println("用户密码加密失败，err:", err)
+		return
+	}
+	user.UserPwd = string(hashedPassword)
+
 	// 该用户ID可用
 	data, err := json.Marshal(user)
 	if err != nil {
@@ -97,8 +106,8 @@ func (udao *UserDao) Login(userID int, userPwd string) (user *userinfo.User, err
 		return
 	}
 
-	// 用获取到了
-	if user.UserPwd != userPwd {
+	// 判断密码是否正确
+	if err = bcrypt.CompareHashAndPassword([]byte(user.UserPwd), []byte(userPwd)); err != nil {
 		err = ERROR_USER_PWD
 		return
 	}

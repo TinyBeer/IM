@@ -2,3 +2,7 @@
 ## explicit
 github.com/garyburd/redigo/internal
 github.com/garyburd/redigo/redis
+# golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
+## explicit
+golang.org/x/crypto/bcrypt
+golang.org/x/crypto/blowfish
