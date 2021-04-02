@@ -3,7 +3,7 @@ package processes
 import (
 	"ChatRoom/Go/common/message"
 	"ChatRoom/Go/common/utils"
-	"ChatRoom/Go/server/model"
+	"ChatRoom/Go/server/dao"
 
 	"encoding/json"
 	"fmt"
@@ -139,10 +139,10 @@ func (up *UserProcess) ServerProccessRegister(mes *message.Message) (err error) 
 	var registerResMes message.RegisterResMes
 
 	// 进行注册
-	err = model.MyUserDao.Register(&registerMes.RegisterUserInfo)
+	err = dao.MyUserDao.Signup(registerMes.UserID, registerMes.UserPwd, registerMes.UserName)
 	if err != nil {
 		switch err {
-		case model.ERROR_USER_EXIST:
+		case dao.ERROR_USER_EXIST:
 			registerResMes.Code = 505
 			registerResMes.Error = err.Error()
 		default:
@@ -189,18 +189,19 @@ func (up *UserProcess) ServerProcessLogin(mes *message.Message) (err error) {
 	// 到redis数据库进行验证
 	switch loginMes.AutenticationType {
 	case message.PasswordType:
-		user, err := model.MyUserDao.Login(loginMes.UserID, loginMes.UserPwd)
+		user, err := dao.MyUserDao.Signin(loginMes.UserID, loginMes.UserPwd)
 		if err != nil {
 			switch err {
-			case model.ERROR_USER_NOTEXIST:
+			case dao.ERROR_USER_NOTEXIST:
 				loginResMes.Code = 500 // 500 用户不存在
 				loginResMes.Error = err.Error()
-			case model.ERROR_USER_PWD:
+			case dao.ERROR_USER_PWD:
 				loginResMes.Code = 403 // 403 密码不正确
 				loginResMes.Error = err.Error()
 			default:
 				loginResMes.Code = 505 // 505 服务器内部错误
 				loginResMes.Error = "服务器内部错误"
+				fmt.Println(err)
 			}
 		} else {
 
@@ -221,7 +222,7 @@ func (up *UserProcess) ServerProcessLogin(mes *message.Message) (err error) {
 				up.NotifyOthersOnline(loginMes.UserID)
 
 				// fmt.Println(user)
-				for id, _ := range userMgr.onlineUsers {
+				for id := range userMgr.onlineUsers {
 					if id == user.UserID {
 						continue
 					}

@@ -3,7 +3,7 @@ package processes
 import (
 	"ChatRoom/Go/common/message"
 	"ChatRoom/Go/common/utils"
-	"ChatRoom/Go/server/model"
+	"ChatRoom/Go/server/dao"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -18,7 +18,7 @@ type SmsProcess struct {
 // 擦看并发送离线消息
 func (sp *SmsProcess) SendOfflineMessage(userID int, conn net.Conn) (err error) {
 	// 获取离线留言
-	dataSlice, mesErr := model.MyUserDao.WithdrawOfflineMesById(userID)
+	dataSlice, mesErr := dao.MyUserDao.WithdrawOfflineMesById(userID)
 	if mesErr != nil {
 		log.Println("WithdrawOfflineMesById failed, err=", mesErr.Error())
 		return
@@ -68,13 +68,9 @@ func (sp *SmsProcess) SendMessage(mes *message.Message) (err error) {
 		return
 	}
 
-	conn := model.MyUserDao.Pool.Get()
-	defer conn.Close()
-
 	// 判断用户是否存在
-	_, err = model.MyUserDao.GetUserById(conn, messageMes.ToUserID)
-	if err != nil {
-		log.Println("GetUserById failed, err", err.Error())
+	if !dao.MyUserDao.IsExist(messageMes.ToUserID) {
+		log.Println("user not exist")
 		return
 	}
 
@@ -99,7 +95,7 @@ func (sp *SmsProcess) SendMessage(mes *message.Message) (err error) {
 		sp.SendMesToEachOnlineUser(&sendMes, up.Conn)
 	} else {
 		// 4.2 不在线 转存消息
-		err = model.MyUserDao.DepositUserOfflineMesById(messageMes.ToUserID, []byte(mes.Data))
+		err = dao.MyUserDao.DepositUserOfflineMesById(messageMes.ToUserID, []byte(mes.Data))
 		if err != nil {
 			log.Println("DepositUserOfflineMesById failed, err=", err.Error())
 			return

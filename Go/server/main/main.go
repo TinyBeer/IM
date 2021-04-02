@@ -1,7 +1,7 @@
 package main
 
 import (
-	"ChatRoom/Go/server/model"
+	"ChatRoom/Go/server/cache"
 	"ChatRoom/Go/server/processes"
 	"fmt"
 	"net"
@@ -11,7 +11,7 @@ import (
 func main() {
 	fmt.Println("服务器启动...")
 	// 初始化Dao功能
-	model.InitDao("localhost:6379", 16, 0, 300*time.Second)
+	cache.InitPool("localhost", 6379, 4, 8, 300*time.Second)
 
 	// fmt.Println("服务器[新结构]在8889端口监听...")
 
