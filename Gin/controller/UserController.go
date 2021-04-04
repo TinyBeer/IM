@@ -6,6 +6,7 @@ import (
 	"ChatRoom/Gin/model"
 	"ChatRoom/Gin/processes"
 	"ChatRoom/Gin/response"
+	"fmt"
 
 	"log"
 	"net/http"
@@ -112,6 +113,36 @@ func Login(ctx *gin.Context) {
 
 func Info(ctx *gin.Context) {
 	user, _ := ctx.Get("user")
-
 	response.Success(ctx, gin.H{"code": 200, "user": user}, "")
+}
+
+var contentList []model.UserMes
+
+func Speak(ctx *gin.Context) {
+	var userMes model.UserMes
+	userInter, _ := ctx.Get("user")
+	userMes.Speaker, _ = userInter.(model.UserInfo)
+	data, _ := ctx.GetRawData()
+	userMes.Content = string(data)
+
+	contentList = append(contentList, userMes)
+
+	for _, content := range contentList {
+		fmt.Println(content)
+	}
+
+	response.Success(ctx, nil, "发言成功")
+}
+
+func GetContent(ctx *gin.Context) {
+	str := ctx.Param("id")
+	id, _ := strconv.Atoi(str)
+	fmt.Println(id)
+
+	if id >= len(contentList) {
+		response.Success(ctx, gin.H{"content": nil, "content_id": len(contentList)}, "接收成功")
+	} else {
+		response.Success(ctx, gin.H{"content": contentList[id:], "content_id": len(contentList)}, "接收成功")
+	}
+
 }

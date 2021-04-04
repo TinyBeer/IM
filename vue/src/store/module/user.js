@@ -57,6 +57,26 @@ const userModule = {
       });
     },
 
+    speak(context, content) {
+      return new Promise((resolve, reject) => {
+        userService.speak(content).then((res) => {
+          resolve(res);
+        }).catch((err) => {
+          reject(err);
+        });
+      });
+    },
+
+    getContent(context, contentId) {
+      return new Promise((resolve, reject) => {
+        userService.getContent(contentId).then((res) => {
+          resolve(res);
+        }).catch((err) => {
+          reject(err);
+        });
+      });
+    },
+
     logout({ commit }) {
       // 清除token
       commit('SET_TOKEN', '');

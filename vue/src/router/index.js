@@ -10,9 +10,9 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    meta: {
-      auth: true, // 本路由需要验证
-    },
+    // meta: {
+    //   auth: true, // 本路由需要验证
+    // },
     component: Home,
   },
   {
